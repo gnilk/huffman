@@ -3,4 +3,4 @@ project(asciicomp)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(asciicomp main.cpp)
+add_executable(asciicomp main.cpp FastHuffman.cpp)

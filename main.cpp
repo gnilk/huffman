@@ -15,6 +15,7 @@
 #include <map>
 #include <queue>
 #include "BitStream.hpp"
+#include "FastHuffman.h"
 
 static size_t fsize(const char *filename) {
     struct stat buf;
@@ -75,6 +76,14 @@ static void calcHistogram(HISTOGRAM &histogram, const uint8_t *data, size_t szDa
         histogram[byte] = histogram[byte] + 1;
     }
 }
+static void printHistogram(HISTOGRAM &histogram) {
+    for(int i=0;i<255;i++) {
+        if (histogram[i] == 0) continue;
+        char ch = '.';
+        if ((i > 31) && (i<128)) ch = i;
+        printf("%.2x (%c) : %d\n", i,ch,histogram[i]);
+    }
+}
 
 static Node *createNode(uint8_t val, uint32_t freq) {
     auto node = new Node();
@@ -119,8 +128,8 @@ static NodeLeafs buildHuffmanTree(HISTOGRAM &histogram) {
     int iteration = 1;
     struct Node *parent;
     while(!nodes.empty()) {
-//        printf("====================\n");
-//        printf("IT: %d\n", iteration);
+        printf("====================\n");
+        printf("IT: %d\n", iteration);
         iteration++;
         auto leafA = nodes.top();
         nodes.pop();
@@ -137,7 +146,7 @@ static NodeLeafs buildHuffmanTree(HISTOGRAM &histogram) {
         parent->left = leafA.second;
         parent->right = leafB.second;
         nodes.push(PQPair(parent->freq, parent));
-//        printQueue(nodes);
+        printQueue(nodes);
     }
     return leafs;
 }
@@ -174,7 +183,7 @@ static void compressWithHuffmanTree(NodeLeafs &nodeLeafs, const uint8_t *data, s
     BitStream bitStream;
     for(int i=0;i<szData;i++) {
         auto path = huffmanPathForValue(nodeLeafs, data[i]);
-//        printPath(data[i], path);
+        printPath(data[i], path);
         bitStream.Write(path);
     }
     if (bitStream.FlushToFile("Compressed.bin")) {
@@ -182,7 +191,11 @@ static void compressWithHuffmanTree(NodeLeafs &nodeLeafs, const uint8_t *data, s
     }
 }
 
+
+
+
 int main() {
+
     size_t sz;
     printf("Loading file\n");
     // test.txt: 'BCAADDDCCACACAC'
@@ -194,6 +207,7 @@ int main() {
     HISTOGRAM histogram;
     printf("Computing histogram\n");
     calcHistogram(histogram, data, sz);
+    printHistogram(histogram);
     printf("Building huffman tree\n");
     auto tree = buildHuffmanTree(histogram);
     // Use the huffman tree to compress the following: 'ABCD'
@@ -204,4 +218,10 @@ int main() {
     // There will by 7 stray bits - ergo, we need 2 bytes...
     //
     compressWithHuffmanTree(tree, reinterpret_cast<const uint8_t *>("ABCD"), 4);
+    printf("FAST HUFF\n");
+    FastHuffman fastHuffman{};
+    fastHuffman.CalcHistogram(data, sz);
+    fastHuffman.PrintHistogram();
+    fastHuffman.BuildTree();
+    fastHuffman.CompressWithTree(reinterpret_cast<const uint8_t *>("ABCD"), 4);
 }

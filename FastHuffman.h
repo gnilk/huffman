@@ -1,5 +1,5 @@
 //
-// Created by Fredrik Kling on 18/02/2022.
+//
 //
 
 #ifndef ASCIICOMP_FASTHUFFMAN_H
@@ -9,6 +9,9 @@
 #include <stdlib.h>
 #include <vector>
 
+// This controls the range of our values and can be used to minimize the statuc arrays
+// For instance if you know you are dealing with ASCII (0..127) then set this to 128 and change
+// the T_VALUE to int8_t
 #define FASTHUFF_VALUE_RANGE 256
 
 class FastHuffman {

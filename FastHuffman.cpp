@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include "FastHuffman.h"
+#include <string.h>
 
 // Initialize the huffman encoding
 FastHuffman::FastHuffman() : nPQItems(0),nTreeNodes(0) {
@@ -196,6 +197,7 @@ std::vector<uint8_t> FastHuffman::PathForValue(uint8_t value) {
         value = idxParent;
     }
     // Reverse the path - this is needed to traverse the tree during decompression...
+    // NOTE: Only in C++20
     std::reverse(path.begin(), path.end());
     return path;
 }

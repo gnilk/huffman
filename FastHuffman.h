@@ -34,8 +34,7 @@ public:
     };
     struct TreeNode {
         T_VALUE idxParent, idxLeft, idxRight;
-        T_VALUE value;
-        T_FREQ freq;
+//        T_VALUE value;
     };
 public:
     FastHuffman();
@@ -43,23 +42,31 @@ public:
     void CalcHistogram(const uint8_t *data, size_t szData);
     void BuildTree();
     void CompressWithTree(const uint8_t *data, size_t szData);
+    void PrintTree();
     void PrintHistogram();
     void PrintPQueue();
     // These are more or less just for debugging...
+    // The path is a left/right (0,1) array for traversing the tree top->down
     std::vector<uint8_t> PathForValue(uint8_t value);
     void PrintPath(uint8_t value, std::vector<uint8_t> &path);
+protected:
+    void Reset();
+    void ResetPQ();
+    void ResetTree();
+    void ResetHistogram();
 private:
     bool PQIsEmpty();
+    bool IsNodeValid(TreeNode *node);
     void PushPQItem(T_VALUE value, T_FREQ freq);
     PQItem PopPQItem();
     static TreeNode *InitNode(TreeNode *node, T_VALUE value, T_FREQ freq);
 private:
-    int nItems;
-    PQItem items[FASTHUFF_VALUE_RANGE]{};
+    int nPQItems,nTreeNodes;
+    PQItem pqItems[FASTHUFF_VALUE_RANGE]{};
     // Since we add intermediate nodes to the tree we need a few more...
     // note twice, but n + n*log(n) - however, this is easier.. =)
     TreeNode nodes[FASTHUFF_VALUE_RANGE * 2]{};
-    uint32_t histogram[FASTHUFF_VALUE_RANGE]{};
+    T_FREQ histogram[FASTHUFF_VALUE_RANGE]{};
 };
 
 

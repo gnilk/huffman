@@ -224,4 +224,5 @@ int main() {
     fastHuffman.PrintHistogram();
     fastHuffman.BuildTree();
     fastHuffman.CompressWithTree(reinterpret_cast<const uint8_t *>("ABCD"), 4);
+    fastHuffman.PrintTree();
 }
